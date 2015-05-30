@@ -1,0 +1,19 @@
+machine:
+  php:
+    version: 5.6.5
+  timezone:
+      UTC
+
+dependencies:
+  pre:
+      - echo "memory_limit = 2048M" > ~/.phpenv/versions/$(phpenv global)/etc/conf.d/memory.ini
+  override:
+      - composer install --prefer-dist --no-interaction --no-progress
+
+test:
+
+  override:
+    - phpunit --log-junit $CIRCLE_TEST_REPORTS/phpunit/tests.xml
+
+  post:
+    - cp request.log "$CIRCLE_ARTIFACTS"

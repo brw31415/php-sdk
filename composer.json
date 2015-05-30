@@ -1,0 +1,24 @@
+{
+  "name": "timekit-io/php-sdk",
+  "description": "Timekit API PHP sdk",
+  "require": {
+    "guzzlehttp/guzzle": "~5.3",
+    "nesbot/carbon": "^1.19",
+    "monolog/monolog": "^1.13"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Timekit\\": "src/Timekit/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Visti Kløft",
+      "email": "vk@timekit.io"
+    }
+  ],
+  "minimum-stability": "stable"
+}
