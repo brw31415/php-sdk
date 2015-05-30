@@ -6,7 +6,7 @@ Timekit is a simple API to work with calendars. Find availability among users or
 
 #### Installation
 
-`composer require "timekit-io/php-sdk": "1.0.0"`
+`composer require "timekit-io/php-sdk": "1.0.*"`
 
 #### Documentation
 
