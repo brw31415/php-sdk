@@ -21,6 +21,8 @@ class APIClient
 
     private $logger;
 
+    private $outputTimestampFormat;
+
     public function __construct($timekitApp, $debug = false)
     {
         // Enabled this if you dont have set the default timezone on your server (required for Monolog)
@@ -108,6 +110,20 @@ class APIClient
         return $this;
     }
 
+    public function setTimestampOutputFormat($format)
+    {
+        $this->addHeader(['Timekit-OutputTimestampFormat' => $format]);
+        $this->outputTimestampFormat = $format;
+        return $this;
+    }
+
+    public function setTimestampInputFormat($format)
+    {
+        $this->addHeader(['Timekit-InputTimestampFormat' => $format]);
+        $this->outputTimestampFormat = $format;
+        return $this;
+    }
+
     /**
      * Internal method for make the call to Timekit API
      *
@@ -138,7 +154,7 @@ class APIClient
             $response = $this->client->$method($url, ['body' => $body]);
             $code = $response->getStatusCode();
             if ($returnJson) {
-                $response = $response->json()['data'];
+                $response = $response->json();
             } else {
                 $response = $response->getBody()->getContents();
             }
@@ -176,18 +192,20 @@ class APIClient
      * http://developers.timekit.io/v2/docs/findtime
      *
      * @param array $emails
+     * @param array $filters
      * @param string $future
      * @param string $length
      * @return TimekitResponse
      * @throws TimekitException
      */
 
-    public function findtime(Array $emails, $future = '2 days', $length = '30 minutes')
+    public function findtime(Array $emails, $filters = null, $future = '2 days', $length = '30 minutes')
     {
         $json = [
-            'emails' => $emails,
-            'future' => $future,
-            'length' => $length
+            'emails'  => $emails,
+            'future'  => $future,
+            'length'  => $length,
+            'filters' => $filters
         ];
 
         $response = $this->makeRequest('post', 'findtime', [], $json);
@@ -307,6 +325,23 @@ class APIClient
         $params = ['start' => $start, 'end' => $end, 'email' => $email];
 
         return $this->makeRequest('get', 'events/availability', $params);
+    }
+
+    public function createEvent($start, $end, $what, $where, $participants, $invite = false, $calendar_token = 'primary')
+    {
+        /*
+         * 'start'          => 'required',
+            'end'            => 'required',
+            'what'           => 'required',
+            'where'          => 'required',
+            'calendar_token' => 'required',
+            'participants'   => 'isListOfEmails',
+            'invite'         => 'sometimes|boolean'
+         */
+
+        $params = compact('start', 'end', 'where', 'what', 'participants', 'invite', 'calendar_token');
+
+        return $this->makeRequest('post', 'events', [], $params);
     }
 
     /**
@@ -462,5 +497,12 @@ class APIClient
         return $this->makeRequest('put', 'properties', [], $body);
     }
 
+    /**
+     * @return String
+     */
+    public function getOutputTimestampFormat()
+    {
+        return $this->outputTimestampFormat;
+    }
 
 }
