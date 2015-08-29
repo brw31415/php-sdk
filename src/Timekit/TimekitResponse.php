@@ -23,7 +23,7 @@ class TimekitResponse
      */
     public function getData()
     {
-        return $this->data;
+        return $this->data['data'];
     }
 
     /**
