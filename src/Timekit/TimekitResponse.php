@@ -4,7 +4,6 @@ namespace Timekit;
 
 class TimekitResponse
 {
-
     private $data;
     private $code;
 
@@ -33,6 +32,4 @@ class TimekitResponse
     {
         return $this->code;
     }
-
-
 }

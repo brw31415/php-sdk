@@ -5,7 +5,6 @@ use Timekit\APIClient;
 
 class APITest extends PHPUnit_Framework_TestCase
 {
-
     /**
      * @var APIClient
      */
@@ -17,14 +16,14 @@ class APITest extends PHPUnit_Framework_TestCase
     {
         $this->api = new APIClient(getenv('APP_ID'), true);
         $this->docBrown = [
-            'email' => 'doc.brown@timekit.io',
+            'email'    => 'doc.brown@timekit.io',
             'password' => getenv('DOCBROWN_PASSWORD'),
-            'token' => getenv('DOCBROWN_TOKEN')
+            'token'    => getenv('DOCBROWN_TOKEN'),
         ];
 
         $this->timebirdCPH = [
             'email' => 'timebirdcph@gmail.com',
-            'token' => getenv('TIMEBIRDCPH_TOKEN')
+            'token' => getenv('TIMEBIRDCPH_TOKEN'),
         ];
     }
 
@@ -86,7 +85,7 @@ class APITest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * test
+     * test.
      */
     public function can_call_accounts_google_calendars()
     {
@@ -97,7 +96,7 @@ class APITest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * test
+     * test.
      */
     public function can_call_accounts_sync()
     {
@@ -169,10 +168,9 @@ class APITest extends PHPUnit_Framework_TestCase
     {
         $this->api->setUser($this->docBrown['email'], $this->docBrown['token']);
         $data = [
-            'what'        => 'Random meeting ' . uniqid(),
+            'what'        => 'Random meeting '.uniqid(),
             'where'       => 'Nowhere',
-            'suggestions' =>
-                [
+            'suggestions' => [
                     [
                         'start' => '2015-05-30T12:00:00.000Z',
                         'end'   => '2015-05-30T13:00:00.000Z',
@@ -180,8 +178,8 @@ class APITest extends PHPUnit_Framework_TestCase
                     [
                         'start' => '2015-05-29T12:00:00.000Z',
                         'end'   => '2015-05-29T13:00:00.000Z',
-                    ]
-                ]
+                    ],
+                ],
         ];
         $response = $this->api->createMeeting($data);
 
@@ -247,7 +245,7 @@ class APITest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Disabled for now! Need some mocking
+     * Disabled for now! Need some mocking.
      */
     public function can_book_meeting()
     {
@@ -262,8 +260,8 @@ class APITest extends PHPUnit_Framework_TestCase
      */
     public function can_put_meeting()
     {
-        $what = 'new what ' . uniqid();
-        $where = 'new where ' . uniqid();
+        $what = 'new what '.uniqid();
+        $where = 'new where '.uniqid();
 
         $this->api->setUser($this->timebirdCPH['email'], $this->timebirdCPH['token']);
         $response = $this->api->editMeeting('wusZZllTbrTC', ['what' => $what, 'where' => $where]);
@@ -276,7 +274,7 @@ class APITest extends PHPUnit_Framework_TestCase
      */
     public function create_user()
     {
-        $response = $this->api->createUser(['first_name' => 'Peter', 'last_name' => 'Hansen', 'email' => uniqid() . '@timekit.io', 'timezone' => 'Europe/Copenhagen']);
+        $response = $this->api->createUser(['first_name' => 'Peter', 'last_name' => 'Hansen', 'email' => uniqid().'@timekit.io', 'timezone' => 'Europe/Copenhagen']);
 
         $this->assertEquals(201, $response->getCode());
     }
@@ -313,5 +311,4 @@ class APITest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(204, $response->getCode());
     }
-
 }

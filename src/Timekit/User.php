@@ -1,12 +1,9 @@
 <?php
 
-
 namespace Timekit;
-
 
 class User
 {
-
     private $email;
 
     private $token;
@@ -45,8 +42,6 @@ class User
 
     public function __toString()
     {
-        return sprintf("User [email: %s, token: %s]", $this->getEmail(), $this->getToken());
+        return sprintf('User [email: %s, token: %s]', $this->getEmail(), $this->getToken());
     }
-
-
 }

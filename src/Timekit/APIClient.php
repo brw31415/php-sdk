@@ -10,7 +10,6 @@ use Monolog\Logger;
 
 class APIClient
 {
-
     private $baseUrl = 'https://api.timekit.io/';
 
     private $version = 'v2';
@@ -32,7 +31,7 @@ class APIClient
         $debug ? $level = Logger::DEBUG : $level = Logger::EMERGENCY;
         $this->logger->pushHandler(new StreamHandler('request.log', $level));
 
-        $this->baseUrl .= $this->version . '/';
+        $this->baseUrl .= $this->version.'/';
         $this->timekitApp = $timekitApp;
         $this->client = new Client([
             'base_url' => $this->baseUrl,
@@ -41,11 +40,11 @@ class APIClient
     }
 
     /**
-     * Add a header to the Timekit request
+     * Add a header to the Timekit request.
      *
      * @param array $headers
      */
-    private function addHeader(Array $headers)
+    private function addHeader(array $headers)
     {
         $default = $this->client->getDefaultOption();
         $default['headers'] = array_merge($default['headers'], $headers);
@@ -54,11 +53,11 @@ class APIClient
 
     /**
      * Set the user when making authenticated requests
-     * You need the email and the api token. So you need to save this token when you make an auth request, see method: auth($email, $password)
+     * You need the email and the api token. So you need to save this token when you make an auth request, see method: auth($email, $password).
+     *
      * @param $email
      * @param $token
      */
-
     public function setUser($email, $token)
     {
         $this->user = new User($email, $token);
@@ -67,13 +66,13 @@ class APIClient
     }
 
     /**
-     * Authenticate a user using email and password. This will return a api token that you need to authenticate each request. So save this token somewhere
+     * Authenticate a user using email and password. This will return a api token that you need to authenticate each request. So save this token somewhere.
      *
      * @param $email
      * @param $password
+     *
      * @throws TimekitException
      */
-
     public function auth($email, $password)
     {
         $response = $this->makeRequest('post', 'auth', [], ['email' => $email, 'password' => $password]);
@@ -81,28 +80,29 @@ class APIClient
     }
 
     /**
-     * If you want to change the input or output format of timestamp you can set it here. Default is: 2004-02-12T15:19:21+00:00 (format: Y-m-d\TH:i:sP, see: http://php.net/manual/en/function.date.php)
+     * If you want to change the input or output format of timestamp you can set it here. Default is: 2004-02-12T15:19:21+00:00 (format: Y-m-d\TH:i:sP, see: http://php.net/manual/en/function.date.php).
      *
      * @param $format
+     *
      * @return $this
      */
     public function setTimestampFormat($format)
     {
         $this->addHeader([
             'Timekit-OutputTimestampFormat' => $format,
-            'Timekit-InputTimestampFormat'  => $format
+            'Timekit-InputTimestampFormat'  => $format,
         ]);
 
         return $this;
     }
 
     /**
-     * If you need a response in a specific timezone set it here. Default is UTC
+     * If you need a response in a specific timezone set it here. Default is UTC.
      *
      * @param $timezone
+     *
      * @return $this
      */
-
     public function setTimezone($timezone)
     {
         $this->addHeader(['Timekit-Timezone' => $timezone]);
@@ -114,6 +114,7 @@ class APIClient
     {
         $this->addHeader(['Timekit-OutputTimestampFormat' => $format]);
         $this->outputTimestampFormat = $format;
+
         return $this;
     }
 
@@ -121,28 +122,30 @@ class APIClient
     {
         $this->addHeader(['Timekit-InputTimestampFormat' => $format]);
         $this->outputTimestampFormat = $format;
+
         return $this;
     }
 
     /**
-     * Internal method for make the call to Timekit API
+     * Internal method for make the call to Timekit API.
      *
      * @param $method
      * @param $url
      * @param array $params
      * @param array $body
-     * @param bool $returnJson
-     * @return TimekitResponse
+     * @param bool  $returnJson
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     private function makeRequest($method, $url, $params = [], $body = [], $returnJson = true)
     {
         if (!empty($params)) {
             $params = http_build_query($params);
-            $url .= '?' . $params;
+            $url .= '?'.$params;
         }
-        $completeUrl = $this->baseUrl . $url;
+        $completeUrl = $this->baseUrl.$url;
 
         if ($this->debugMode) {
             $this->logger->addDebug(sprintf('Calling [%s] %s with %s', strtoupper($method), $completeUrl, print_r($body, true)));
@@ -162,50 +165,52 @@ class APIClient
             $response = $exception->getResponse()->getBody()->getContents();
             $code = $exception->getCode();
             $this->logger->addError(sprintf('Current user: %s', $this->user));
-            $this->logger->addError(sprintf("[%s] %s", $code, print_r($response, true)));
+            $this->logger->addError(sprintf('[%s] %s', $code, print_r($response, true)));
             throw new TimekitException($response, $code, $exception);
         }
 
         if ($this->debugMode) {
-            $this->logger->addDebug(sprintf("[%s] Timekit returned: %s", $code, print_r($response, true)) . "\n");
+            $this->logger->addDebug(sprintf('[%s] Timekit returned: %s', $code, print_r($response, true))."\n");
         }
 
         return new TimekitResponse($response, $code);
     }
 
     /**
-     * Internal method to help with appending id's to urls
+     * Internal method to help with appending id's to urls.
+     *
      * @param $id
      * @param $resource
+     *
      * @return string
      */
-
     private function appendIfNotNull($id, $resource)
     {
-        $url = $id !== null ? $resource . '/' . $id : $resource;
+        $url = $id !== null ? $resource.'/'.$id : $resource;
 
         return $url;
     }
 
     /**
      * Look for mutual availability for multiple users
-     * http://developers.timekit.io/v2/docs/findtime
+     * http://developers.timekit.io/v2/docs/findtime.
      *
-     * @param array $emails
-     * @param array $filters
+     * @param array  $emails
+     * @param array  $filters
      * @param string $future
      * @param string $length
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
-    public function findtime(Array $emails, $filters = null, $future = '2 days', $length = '30 minutes')
+    public function findtime(array $emails, $filters = null, $future = '2 days', $length = '30 minutes')
     {
         $json = [
             'emails'  => $emails,
             'future'  => $future,
             'length'  => $length,
-            'filters' => $filters
+            'filters' => $filters,
         ];
 
         $response = $this->makeRequest('post', 'findtime', [], $json);
@@ -215,10 +220,11 @@ class APIClient
 
     /**
      * Get calendars for a google account (only works for a user with at google accounts)
-     * http://developers.timekit.io/v2/docs/accountsgooglecalendars
+     * http://developers.timekit.io/v2/docs/accountsgooglecalendars.
+     *
+     * @throws TimekitException
      *
      * @return TimekitResponse
-     * @throws TimekitException
      */
     public function accountsGoogleCalendars()
     {
@@ -227,12 +233,12 @@ class APIClient
 
     /**
      * Get all accounts for a user
-     * http://developers.timekit.io/v2/docs/accounts
+     * http://developers.timekit.io/v2/docs/accounts.
+     *
+     * @throws TimekitException
      *
      * @return TimekitResponse
-     * @throws TimekitException
      */
-
     public function getAccounts()
     {
         return $this->makeRequest('get', 'accounts');
@@ -240,10 +246,11 @@ class APIClient
 
     /**
      * Redirect to a google signup page
-     * http://developers.timekit.io/v2/docs/accountsgooglesignup
+     * http://developers.timekit.io/v2/docs/accountsgooglesignup.
+     *
+     * @throws TimekitException
      *
      * @return TimekitResponse
-     * @throws TimekitException
      */
     public function accountsGoogleSignup()
     {
@@ -252,10 +259,11 @@ class APIClient
 
     /**
      * Sync a users accounts
-     * http://developers.timekit.io/v2/docs/accountssync
+     * http://developers.timekit.io/v2/docs/accountssync.
+     *
+     * @throws TimekitException
      *
      * @return TimekitResponse
-     * @throws TimekitException
      */
     public function accountsSync()
     {
@@ -264,14 +272,15 @@ class APIClient
 
     /**
      * Get all or a single calendar(s) for a user
-     * http://developers.timekit.io/v2/docs/calendars
+     * http://developers.timekit.io/v2/docs/calendars.
      *
-     * @param null $id
+     * @param null  $id
      * @param array $params
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function getCalendars($id = null, $params = [])
     {
         $url = $this->appendIfNotNull($id, 'calendars');
@@ -281,12 +290,12 @@ class APIClient
 
     /**
      * Get all contacts for a user
-     * http://developers.timekit.io/v2/docs/contacts
+     * http://developers.timekit.io/v2/docs/contacts.
+     *
+     * @throws TimekitException
      *
      * @return TimekitResponse
-     * @throws TimekitException
      */
-
     public function getContacts()
     {
         return $this->makeRequest('get', 'contacts');
@@ -294,14 +303,15 @@ class APIClient
 
     /**
      * Get all events between start and end timestamps. Default format is: 2004-02-12T15:19:21+00:00
-     * http://developers.timekit.io/v2/docs/events
+     * http://developers.timekit.io/v2/docs/events.
      *
      * @param $start
      * @param $end
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function getEvents($start, $end)
     {
         $params = ['start' => $start, 'end' => $end];
@@ -311,15 +321,16 @@ class APIClient
 
     /**
      * Get the anonymized events for a user between start & end
-     * http://developers.timekit.io/v2/docs/eventsavailability
+     * http://developers.timekit.io/v2/docs/eventsavailability.
      *
      * @param $start
      * @param $end
      * @param $email
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function eventsAvailability($start, $end, $email)
     {
         $params = ['start' => $start, 'end' => $end, 'email' => $email];
@@ -346,11 +357,13 @@ class APIClient
 
     /**
      * Create a meeting
-     * http://developers.timekit.io/v2/docs/meetings
+     * http://developers.timekit.io/v2/docs/meetings.
      *
      * @param $data
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
     public function createMeeting($data)
     {
@@ -360,12 +373,14 @@ class APIClient
     /**
      * Get all or a single meeting(s) for a user
      * http://developers.timekit.io/v2/docs/meetings-1 - all meetings
-     * http://developers.timekit.io/v2/docs/meetingstoken - single meeting
+     * http://developers.timekit.io/v2/docs/meetingstoken - single meeting.
      *
-     * @param null $token
+     * @param null  $token
      * @param array $params
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
     public function getMeetings($token = null, $params = [])
     {
@@ -376,12 +391,14 @@ class APIClient
 
     /**
      * Set the availability for a meeting as a user
-     * http://developers.timekit.io/v2/docs/meetingsavailability
+     * http://developers.timekit.io/v2/docs/meetingsavailability.
      *
      * @param $suggestion_id
      * @param $availability
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
     public function setMeetingAvailability($suggestion_id, $availability)
     {
@@ -392,13 +409,14 @@ class APIClient
 
     /**
      * Book a meeting by selecting a suggestion (a set of start & end times)
-     * http://developers.timekit.io/v2/docs/meetingsbook
+     * http://developers.timekit.io/v2/docs/meetingsbook.
      *
      * @param $suggestion_id
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function bookMeeting($suggestion_id)
     {
         $body = ['suggestion_id' => $suggestion_id];
@@ -408,14 +426,15 @@ class APIClient
 
     /**
      * Update a meeting
-     * http://developers.timekit.io/v2/docs/meetingstoken-1
+     * http://developers.timekit.io/v2/docs/meetingstoken-1.
      *
      * @param $token
      * @param $body
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function editMeeting($token, $body)
     {
         $url = $this->appendIfNotNull($token, 'meetings');
@@ -425,13 +444,14 @@ class APIClient
 
     /**
      * Get info of the current user
-     * http://developers.timekit.io/v2/docs/usersme
+     * http://developers.timekit.io/v2/docs/usersme.
      *
      * @param array $params
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function me($params = [])
     {
         return $this->makeRequest('get', 'users/me', $params);
@@ -439,13 +459,14 @@ class APIClient
 
     /**
      * Create a new user on timekit
-     * http://developers.timekit.io/v2/docs/users
+     * http://developers.timekit.io/v2/docs/users.
      *
      * @param $body
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function createUser($body)
     {
         return $this->makeRequest('post', 'users', [], $body);
@@ -453,11 +474,13 @@ class APIClient
 
     /**
      * Update the current user
-     * http://developers.timekit.io/v2/docs/usersme-1
+     * http://developers.timekit.io/v2/docs/usersme-1.
      *
      * @param $body
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
     public function updateUser($body)
     {
@@ -466,13 +489,14 @@ class APIClient
 
     /**
      * Get user properties for the current user
-     * http://developers.timekit.io/v2/docs/properties
+     * http://developers.timekit.io/v2/docs/properties.
      *
      * @param null $id
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function getUserProperties($id = null)
     {
         $url = $this->appendIfNotNull($id, 'properties');
@@ -482,14 +506,15 @@ class APIClient
 
     /**
      * Set a user property for the current user
-     * http://developers.timekit.io/v2/docs/properties-1
+     * http://developers.timekit.io/v2/docs/properties-1.
      *
      * @param $key
      * @param $value
-     * @return TimekitResponse
+     *
      * @throws TimekitException
+     *
+     * @return TimekitResponse
      */
-
     public function setUserProperty($key, $value)
     {
         $body = ['key' => $key, 'value' => $value];
@@ -504,5 +529,4 @@ class APIClient
     {
         return $this->outputTimestampFormat;
     }
-
 }
