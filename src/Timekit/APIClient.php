@@ -327,19 +327,9 @@ class APIClient
         return $this->makeRequest('get', 'events/availability', $params);
     }
 
-    public function createEvent($start, $end, $what, $where, $participants, $invite = false, $calendar_token = 'primary')
+    public function createEvent($start, $end, $what, $where, $participants, $invite = false, $calendar_id)
     {
-        /*
-         * 'start'          => 'required',
-            'end'            => 'required',
-            'what'           => 'required',
-            'where'          => 'required',
-            'calendar_token' => 'required',
-            'participants'   => 'isListOfEmails',
-            'invite'         => 'sometimes|boolean'
-         */
-
-        $params = compact('start', 'end', 'where', 'what', 'participants', 'invite', 'calendar_token');
+        $params = compact('start', 'end', 'where', 'what', 'participants', 'invite', 'calendar_id');
 
         return $this->makeRequest('post', 'events', [], $params);
     }
