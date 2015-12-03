@@ -1,6 +1,6 @@
-### Timekit API SDK
+### PHP SDK for Timekit API
 
-Smart scheduling as a service, now in preview
+> ***Note that this library is currently unmaintained and should not be used in production***
 
 Timekit is a simple API to work with calendars. Find availability among users or resources without creating or maintaining any infrastructure.
 
